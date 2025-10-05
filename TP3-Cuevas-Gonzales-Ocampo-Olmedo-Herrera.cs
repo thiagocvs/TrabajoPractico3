@@ -104,19 +104,19 @@ class Program
     static void ListarEquipos(string[,] datos, int filas)
     {
         List<string> equipos = new List<string>();
-        // Paso 1: extraer todos los equipos
+        // separar equipos
         for (int i = 1; i < filas; i++)
         {
             string equipo = datos[i, 1];
 
-            // Paso 2: evitar duplicados manualmente
+            // quitar duplicados
             if (!equipos.Contains(equipo))
             {
                 equipos.Add(equipo);
             }
         }
 
-    // Paso 3: ordenar con Bubble Sort (alfabéticamente)
+    // odenar alfabeticamente
     for (int i = 0; i < equipos.Count - 1; i++)
     {
         for (int j = 0; j < equipos.Count - i - 1; j++)
