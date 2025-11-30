@@ -1,12 +1,10 @@
 using System;
 using System.IO;
-using System.Linq;
 
 class Program
 {
     static void Main()
     {
-        // Ruta del archivo CSV
         string rutaArchivo = @"C:\Users\thiag\OneDrive\Desktop\Programacion\ConsoleApp1\trabajopractico3\f1_last5years.csv";
 
         string[] lineas = File.ReadAllLines(rutaArchivo);
@@ -14,7 +12,6 @@ class Program
         int filas = lineas.Length;
         int cols = lineas[0].Split(',').Length;
 
-        // Cargar datos en matriz
         string[,] datos = new string[filas, cols];
         for (int i = 0; i < filas; i++)
         {
@@ -25,9 +22,9 @@ class Program
             }
         }
 
-        // Menú principal
+        
         int opcion = 0;
-        while (opcion != 6)
+        while (opcion != 7)
         {
             Console.WriteLine("\n===== MENÚ FÓRMULA 1 =====");
             Console.WriteLine("1. Buscar podios de un piloto");
@@ -35,11 +32,12 @@ class Program
             Console.WriteLine("3. Mayor remontada");
             Console.WriteLine("4. Listar equipos (orden alfabético)");
             Console.WriteLine("5. Mostrar todos los datos");
-            Console.WriteLine("6. Salir");
+            Console.WriteLine("6. Calcular La Posioción Promedio De Un Piloto");
+            Console.WriteLine("7. Salir");
             Console.WriteLine("==============================================================================================");
             Console.Write("Seleccione una opción: ");
             opcion = int.Parse(Console.ReadLine());
-
+            //menu
             switch (opcion)
             {
                 case 1:
@@ -58,6 +56,9 @@ class Program
                     MostrarDatos(datos, filas, cols);
                     break;
                 case 6:
+                    PromedioPosicionPiloto(datos, filas, cols);
+                    break;
+                case 7:
                     Console.WriteLine("Saliendo del programa...");
                     break;
                 default:
@@ -73,7 +74,7 @@ class Program
         string piloto = Console.ReadLine().ToLower();
         int podios = 0;
 
-        for (int i = 1; i < filas; i++) // saltar encabezado
+        for (int i = 1; i < filas; i++) 
         {
             string nombre = datos[i, 2].ToLower();
             int posLlegada = int.Parse(datos[i, 5]);
@@ -89,16 +90,75 @@ class Program
 
     static void DatosEquipo(string[,] datos, int filas)
     {
-        
 
-        // Console.WriteLine($"Puntos totales de {equipo} en {temporada}: {totalPuntos}");
+        {
+            Console.Write("Ingrese el año de la temporada: ");
+            string temporada = Console.ReadLine();
+
+            Console.Write("Ingrese el nombre del equipo: ");
+            string equipo = Console.ReadLine().ToLower();
+
+            double totalPuntos = 0;
+            bool hayDatos = false;
+
+            for (int i = 1; i < filas; i++)
+            {
+                string año = datos[i, 0];
+                string nomEquipo = datos[i, 1];
+                nomEquipo = nomEquipo.ToLower();
+
+                if (año == temporada && nomEquipo == equipo)
+                {
+                    hayDatos = true;
+
+                    string piloto = datos[i, 2];
+                    string carrera = datos[i, 3];
+                    double puntos = 0;
+
+                    double.TryParse(datos[i, 6], out puntos);
+
+                    Console.WriteLine($"Carrera: {carrera} | Piloto: {piloto} | Puntos: {puntos}");
+                    totalPuntos += puntos;
+                }
+            }
+
+            if (hayDatos)
+            {
+                Console.WriteLine($"Puntos totales de {equipo} en {temporada}: {totalPuntos}");
+            }
+            else
+            {
+                Console.WriteLine("No se encontraron datos para ese equipo en ese año.");
+            }
+        }
     }
 
     static void MayorRemontada(string[,] datos, int filas)
     {
-        
+        int remontadaMax = -1;
+        string pilotoMax = "";
+        string equipoMax = "";
+        string carreraMax = "";
+        string temporadaMax = "";
 
-        // Console.WriteLine($"Mayor remontada: {pilotoMax} con el equipo de {equipoMax} en {carreraMax}, durante la temporada {temporadaMax}, ganó {remontadaMax} posiciones.");
+        for (int i = 1; i < filas; i++)
+        {
+            int posInicio = int.Parse(datos[i, 4]);
+            int posFinal = int.Parse(datos[i, 5]);
+            int remontada = posInicio - posFinal; 
+
+            if (remontada > remontadaMax)
+            {
+                remontadaMax = remontada;
+                temporadaMax = datos[i, 0];
+                equipoMax = datos[i, 1];
+                pilotoMax = datos[i, 2];
+                carreraMax = datos[i, 3];
+            }
+        }
+        
+        Console.WriteLine($"La mayor remontada fue de {pilotoMax} (Equipo: {equipoMax}) en {carreraMax} ({temporadaMax}). Ganó {remontadaMax} posiciones.");
+       
     }
 
     static void ListarEquipos(string[,] datos, int filas)
@@ -116,27 +176,27 @@ class Program
             }
         }
 
-    // odenar alfabeticamente
-    for (int i = 0; i < equipos.Count - 1; i++)
-    {
-        for (int j = 0; j < equipos.Count - i - 1; j++)
+        // ordenar alfabeticamente
+        for (int i = 0; i < equipos.Count - 1; i++)
         {
-            if (string.Compare(equipos[j], equipos[j + 1]) > 0)
+            for (int j = 0; j < equipos.Count - i - 1; j++)
             {
-                // intercambio
-                string temp = equipos[j];
-                equipos[j] = equipos[j + 1];
-                equipos[j + 1] = temp;
+                if (string.Compare(equipos[j], equipos[j + 1]) > 0)
+                {
+                    // intercambio
+                    string temp = equipos[j];
+                    equipos[j] = equipos[j + 1];
+                    equipos[j + 1] = temp;
+                }
             }
         }
-    }
 
-    // Mostrar
-    Console.WriteLine("Equipos:");
-    foreach (var eq in equipos)
-    {
-        Console.WriteLine(eq);
-    }
+        // mostrar
+        Console.WriteLine("Equipos:");
+        foreach (var eq in equipos)
+        {
+            Console.WriteLine(eq);
+        }
     }
 
     static void MostrarDatos(string[,] datos, int filas, int cols)
@@ -152,6 +212,35 @@ class Program
             Console.WriteLine();
         }
     }
+
+   // Función para calcular el promedio de posición final de un piloto(nueva indicador)
+    static void PromedioPosicionPiloto (string[,] datos, int filas, int cols)
+    {
+        string pilotoBuscado = "";
+        int posFinalSum = 0;
+        int totalCarreras = 0;
+        double promPosicion = 0.00;
+        Console.WriteLine("Ingrese el nombre del piloto: ");
+        pilotoBuscado = Console.ReadLine();
+
+        for (int i = 1; i < filas; i++)
+        {
+
+            string piloto = datos[i, 2];
+            int posFinal = int.Parse(datos[i, 5]);
+
+            if (piloto == pilotoBuscado)
+            {
+                posFinalSum += posFinal;
+                totalCarreras += 1;
+            }
+
+        }
+        promPosicion = posFinalSum * 1.0 / totalCarreras;
+
+        Console.WriteLine($"El Promedio de Posicion De {pilotoBuscado} Es De : {promPosicion} ");
+
+    }
     
 }
-    
+
